@@ -1,9 +1,9 @@
-FROM ubuntu:16.04 
+FROM ubuntu:16.04
 
 ENV TERM=xterm\
     TZ=Europe/Istanbul
 
-ENV DEBIAN_FRONTEND=noninteractive 
+ENV DEBIAN_FRONTEND=noninteractive
 
 # http://nginx.org/en/download.html
 ENV NGINX_VERSION 1.15.8
@@ -38,28 +38,28 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - &&  \
 
 
 RUN apt-get install -y --no-install-recommends \
-	unzip \	
+	unzip \
 	php7.1-pdo-dblib \
 	php7.1-dev \
 	php-pear \
-	php7.1-fpm \ 
-	php7.1-cli \ 
-	php7.1-mbstring \ 
-	php7.1-intl \ 
-	php7.1-mysql \ 
-	php7.1-redis \ 
-	php7.1-memcached \ 
+	php7.1-fpm \
+	php7.1-cli \
+	php7.1-mbstring \
+	php7.1-intl \
+	php7.1-mysql \
+	php7.1-redis \
+	php7.1-memcached \
 	php7.1-memcache \
-	php7.1-gd \ 
-	php7.1-curl \ 
-	php7.1-xsl \ 
-	php7.1-mongodb \ 
-	php7.1-pgsql \ 
+	php7.1-gd \
+	php7.1-curl \
+	php7.1-xsl \
+	php7.1-mongodb \
+	php7.1-pgsql \
 	php7.1-dev \
 	php7.1-apcu \
 	php7.1-common \
 	php7.1-bz2 \
-	php7.1-dba \ 
+	php7.1-dba \
 	php7.1-ssh2 \
 	php7.1-solr \
 	php7.1-apcu \
@@ -69,28 +69,32 @@ RUN apt-get install -y --no-install-recommends \
 	php7.1-uuid \
 	php7.1-imagick \
 	php7.1-yaml \
-	php7.1-odbc \  
+	php7.1-odbc \
 	php7.1-soap \
-	php7.1-zip 
+	php7.1-zip
 
-#ENV LD_LIBRARY_PATH /usr/local/instantclient_11_2/
 
-#RUN wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-basic-linux.x64-11.2.0.4.0.zip | bsdtar -xvf- -C /usr/local && \
-#	wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-sdk-linux.x64-11.2.0.4.0.zip | bsdtar -xvf-  -C /usr/local && \
-#	wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-sqlplus-linux.x64-11.2.0.4.0.zip | bsdtar -xvf- -C /usr/local && \
-#	ln -s /usr/local/instantclient_11_2 /usr/local/instantclient && \
-#	ln -s /usr/local/instantclient/libclntsh.so.11.1 /usr/local/instantclient/libclntsh.so && \
-#	ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus && \
-#	ldconfig && \
-#	echo 'instantclient,/usr/local/instantclient' | pecl install oci8 && \
-#	echo "extension = oci8.so" >> /etc/php/7.1/fpm/php.ini && \
-#	echo "extension = oci8.so" >> /etc/php/7.1/cli/php.ini
+ENV LD_LIBRARY_PATH /usr/local/instantclient_11_2/
+
+RUN wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-basic-linux.x64-11.2.0.4.0.zip | bsdtar -xvf- -C /usr/local && \
+	wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-sdk-linux.x64-11.2.0.4.0.zip | bsdtar -xvf-  -C /usr/local && \
+	wget -qO- https://raw.githubusercontent.com/bumpx/oracle-instantclient/master/instantclient-sqlplus-linux.x64-11.2.0.4.0.zip | bsdtar -xvf- -C /usr/local && \
+	ln -s /usr/local/instantclient_11_2 /usr/local/instantclient && \
+	ln -s /usr/local/instantclient/libclntsh.so.11.1 /usr/local/instantclient/libclntsh.so && \
+	ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus && \
+	ldconfig && \
+	pecl channel-update pecl.php.net && \
+	echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0 && \
+	echo "extension = oci8.so" >> /etc/php/7.1/fpm/php.ini && \
+	echo "extension = oci8.so" >> /etc/php/7.1/cli/php.ini
+
+
 
 #RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
 #RUN echo "deb http://packages.couchbase.com/ubuntu bionic bionic/main" | tee /etc/apt/sources.list.d/couchbase.list
 
 #RUN apt-get update && \
-#  apt-get install -y --no-install-recommends libcouchbase-dev libcouchbase2-bin 
+#  apt-get install -y --no-install-recommends libcouchbase-dev libcouchbase2-bin
 
 #RUN git clone https://github.com/datastax/cpp-driver.git cpp-driver && \
 #	cd cpp-driver && \
@@ -102,36 +106,18 @@ RUN apt-get install -y --no-install-recommends \
 #	make install
 
 
-RUN mkdir -p /opt/oracle \
-    && cd /opt/oracle \
-    && wget https://github.com/hakanbaysal/docker-php-oci8/raw/master/instantclient-basic-linux.x64-12.1.0.2.0.zip \
-    && wget https://github.com/hakanbaysal/docker-php-oci8/raw/master/instantclient-sdk-linux.x64-12.1.0.2.0.zip
-
-# Install Oracle Instantclient
-RUN unzip /opt/oracle/instantclient-basic-linux.x64-12.1.0.2.0.zip -d /opt/oracle \
-    && unzip /opt/oracle/instantclient-sdk-linux.x64-12.1.0.2.0.zip -d /opt/oracle
-    
-RUN ln -s /opt/oracle/instantclient_12_1/libclntsh.so.12.1 /opt/oracle/instantclient_12_1/libclntsh.so \
-    && ln -s /opt/oracle/instantclient_12_1/libclntshcore.so.12.1 /opt/oracle/instantclient_12_1/libclntshcore.so \
-    && ln -s /opt/oracle/instantclient_12_1/libocci.so.12.1 /opt/oracle/instantclient_12_1/libocci.so \
-    && rm -rf /opt/oracle/*.zip
-
-ENV LD_LIBRARY_PATH  /opt/oracle/instantclient_12_1
-
-# Install Oracle extensions
-RUN echo 'instantclient,/opt/oracle/instantclient_12_1/' | pecl install oci8-2.2.0
-
 RUN pecl install \
 	pcs \
-#	cassandra \	
+#	cassandra \
 #	couchbase \
 	swoole \
 #	rdkafka \
-	timezonedb \ 
+	timezonedb \
 	sqlsrv-5.6.0 \
 	pdo_sqlsrv-5.6.0 \
-	pdo_oci8 \ 
-	Mosquitto-0.4.0 
+	pdo_oci8 \
+    pdo_oci \
+	Mosquitto-0.4.0
 
 # 	echo -e "; priority=20\nextension=cassandra.so" > /etc/php/7.1/mods-available/cassandra.ini && \
 RUN	echo -e "; priority=20\nextension=swoole.so" > /etc/php/7.1/mods-available/swoole.ini && \
@@ -140,16 +126,19 @@ RUN	echo -e "; priority=20\nextension=swoole.so" > /etc/php/7.1/mods-available/s
 	echo -e "; priority=20\nextension=mosquitto.so" > /etc/php/7.1/mods-available/mosquitto.ini && \
 	echo -e "; priority=20\nextension=pdo_sqlsrv.so" > /etc/php/7.1/mods-available/pdo_sqlsrv.ini && \
 	echo -e "; priority=20\nextension=sqlsrv.so" > /etc/php/7.1/mods-available/sqlsrv.ini && \
-	echo -e "; priority=20\nextension=oci8.so" > /etc/php/7.1/mods-available/oci8.ini 
+	echo -e "; priority=20\nextension=oci8.so" > /etc/php/7.1/mods-available/pdo_oci8.ini && \
+    echo -e "; priority=20\nextension=pdo_oci.so" > /etc/php/7.1/mods-available/pdo_oci.ini
 # && \
 #        echo -e "; priority=20\nextension=pdo_pgsql.so" > /etc/php/7.1/mods-available/pdo_pgsql.ini && \
 #        echo -e "; priority=20\nextension=pdo_oci.so" > /etc/php/7.1/mods-available/pdo_oci.ini
 #	echo "extension=couchbase.so" >> /etc/php/7.1/mods-available/json.ini
+RUN ln -s /etc/php/7.1/mods-available/pdo_oci.ini /etc/php/7.1/fpm/conf.d/20-pdo_oci.ini
+
 
 RUN phpenmod -v 7.1 -s ALL \
 	pdo_dblib \
 	mosquitto \
-	solr \	
+	solr \
 	ssh2 \
 	#rdkafka \
 	geoip \
@@ -157,20 +146,20 @@ RUN phpenmod -v 7.1 -s ALL \
 	uuid \
 	imagick \
 	yaml \
-	mbstring \ 
-	intl \ 
-	pdo_mysql \ 
-	redis \ 
-	memcached \ 
-	memcache \ 
-	gd \ 
-	curl \ 
-	xml \ 
-	xsl \ 
-	mongodb \ 
-#	xdebug \ 
-	sqlsrv \ 
-	oci8 \ 
+	mbstring \
+	intl \
+	pdo_mysql \
+	redis \
+	memcached \
+	memcache \
+	gd \
+	curl \
+	xml \
+	xsl \
+	mongodb \
+#	xdebug \
+	sqlsrv \
+	oci8 \
 	pdo_sqlsrv \
 	timezonedb \
 	apcu \
@@ -262,7 +251,7 @@ ln -sf /dev/stdout /var/log/nginx/access.log && \
 ln -sf /dev/stderr /var/log/nginx/error.log && \
 mkdir -p /etc/nginx/ssl/ && \
 rm -Rf /var/www/* && \
-rm -Rf /etc/nginx/sites-enabled/* 
+rm -Rf /etc/nginx/sites-enabled/*
 ADD conf/nginx-site.conf /etc/nginx/sites-available/default.conf
 ADD conf/nginx-site-ssl.conf /etc/nginx/sites-available/default-ssl.conf
 RUN ln -s /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
